@@ -164,7 +164,12 @@ public class EditorButton : Editor
 	}
 
 	static object DrawFloatParameter(ParameterInfo parameterInfo,object val) {
-		return EditorGUILayout.FloatField ((float)val);
+		//Since it is legal to define a float param with an integer default value (e.g void method(float p = 5);)
+		//we must use Convert.ToSingle to prevent forbidden casts
+		//because you can't cast an "int" object to float 
+		//See for http://stackoverflow.com/questions/17516882/double-casting-required-to-convert-from-int-as-object-to-float more info
+
+		return EditorGUILayout.FloatField (Convert.ToSingle(val));
 	}
 
 	static object DrawIntParameter(ParameterInfo parameterInfo,object val) {
@@ -202,11 +207,15 @@ public class EditorButton : Editor
 	string MethodDisplayName(MethodInfo method) {
 		StringBuilder sb = new StringBuilder ();
 		sb.Append (method.Name +"(");
-		foreach (ParameterInfo parameter in method.GetParameters()) {
+		var methodParams = method.GetParameters ();
+		foreach (ParameterInfo parameter in methodParams) {
 			sb.Append (MethodParameterDisplayName (parameter));
 			sb.Append (",");
 		}
-		sb.Remove (sb.Length - 1, 1);
+
+		if(methodParams.Length > 0)
+			sb.Remove (sb.Length - 1, 1);
+		
 		sb.Append (")");
 		return sb.ToString ();
 	}

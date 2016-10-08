@@ -16,6 +16,15 @@ public class TestScript : MonoBehaviour {
 	}
 
 	[EditorButton]
+	public void FloatIntDefault(float floatAsInt = 5) {
+		Debug.Log ("floatAsInt " + floatAsInt);
+	}
+
+	[EditorButton]
+	public void EmptyMethod() {
+	}
+
+	[EditorButton]
 	public void PrintStuff(float floatVal, int intVal, string stringVal, bool boolVal) {
 		Debug.Log("floatVal "+floatVal);
 		Debug.Log("intVal "+intVal);
