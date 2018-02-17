@@ -27,3 +27,7 @@ sysinfo.txt
 
 # Builds
 *.apk
+.idea/
+Assets/Plugins/Editor/JetBrains.meta
+Assets/Plugins/Editor/JetBrains/Unity3DRider.cs
+Assets/Plugins/Editor/JetBrains/Unity3DRider.cs.meta

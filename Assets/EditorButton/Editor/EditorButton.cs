@@ -13,6 +13,7 @@ using System.Reflection;
 
 #if UNITY_EDITOR
 [CustomEditor(typeof (MonoBehaviour), true)]
+[CanEditMultipleObjects]
 public class EditorButton : Editor
 {
 	class EditorButtonState {
@@ -71,7 +72,7 @@ public class EditorButton : Editor
 		foreach (var memberInfo in methods)
 		{
 			var method = memberInfo as MethodInfo;
-			DrawButtonforMethod (mono,method,GetEditorButtonState(method,methodIndex));
+			DrawButtonforMethod (targets,method,GetEditorButtonState(method,methodIndex));
 			methodIndex++;
 		}
 	}
@@ -89,7 +90,7 @@ public class EditorButton : Editor
 		return editorButtonStates [methodIndex];
 	}
 
-	void DrawButtonforMethod(MonoBehaviour target, MethodInfo methodInfo, EditorButtonState state) {
+	void DrawButtonforMethod(object[] invokationTargets, MethodInfo methodInfo, EditorButtonState state) {
 		EditorGUILayout.BeginHorizontal ();
 		var foldoutRect = EditorGUILayout.GetControlRect (GUILayout.Width (10.0f));
 		state.opened = EditorGUI.Foldout (foldoutRect, state.opened, "");
@@ -108,12 +109,17 @@ public class EditorButton : Editor
 		}
 
 		if (clicked) {
-			object returnVal = methodInfo.Invoke (target,state.parameters);
 
-			if (returnVal is IEnumerator) {
-				target.StartCoroutine ((IEnumerator)returnVal);
-			} else if(returnVal != null){
-				Debug.Log ("Method call result -> "+returnVal);
+			foreach (var invokationTarget in invokationTargets)
+			{
+				var monoTarget = invokationTarget as MonoBehaviour;
+				object returnVal = methodInfo.Invoke (monoTarget,state.parameters);
+
+				if (returnVal is IEnumerator) {
+					monoTarget.StartCoroutine ((IEnumerator)returnVal);
+				} else if(returnVal != null){
+					Debug.Log ("Method call result -> "+returnVal);
+				}
 			}
 		}
 	}
